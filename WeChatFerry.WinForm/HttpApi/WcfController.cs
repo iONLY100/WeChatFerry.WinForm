@@ -332,6 +332,10 @@ namespace WeChatFerry.WinForm.HttpApi
         public async Task<IActionResult> GetInfoByWxid(OneParamInputDto<string> input)
         {
             var data = await MainForm.Instance.WcfClient.GetInfoByWxid(input.Param);
+            if (data == null)
+            {
+                return new UnifiedResponse<RpcContact>(HttpStatusCode.NotFound, $"未能获取到 {input.Param} 的信息");
+            }
             return new UnifiedResponse<RpcContact>(HttpStatusCode.OK, data: data);
         }
         [HttpPost]

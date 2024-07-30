@@ -1,0 +1,12 @@
+﻿# 调试模式
+debugModel : 1
+# Wcf使用的端口号,监听消息的端口号为此端口号+1
+wcfPort : 10088
+# 启用HttpApi使用的端口号
+httpApiPort : 10090
+# Spy文件路径
+spyFilePath : .\spy\v39.2.4\sdk.dll
+# 消息回调调用的地址
+callBackUrlList :
+    - http://127.0.0.1:19001/api/app/testWeChat/weChatCallBackWxHelper
+    - https://www.baidu.com

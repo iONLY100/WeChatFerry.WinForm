@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatFerry.WinForm", "WeChatFerry.WinForm\WeChatFerry.WinForm.csproj", "{DEC41E09-5DD0-4FF0-A77F-EE9D0B5878D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEC41E09-5DD0-4FF0-A77F-EE9D0B5878D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC41E09-5DD0-4FF0-A77F-EE9D0B5878D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC41E09-5DD0-4FF0-A77F-EE9D0B5878D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC41E09-5DD0-4FF0-A77F-EE9D0B5878D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {487FA725-6F20-4AEA-AECB-CD86D8CBFF61}
+	EndGlobalSection
+EndGlobal

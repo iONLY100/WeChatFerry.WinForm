@@ -93,7 +93,8 @@ namespace WeChatFerry.WinForm.HttpApi
         public async Task<IActionResult> GetDbTables(OneParamInputDto<string> input)
         {
             var data = await MainForm.Instance.WcfClient.GetDbTables(input.Param);
-            return new UnifiedResponse<List<(string, string)>>(HttpStatusCode.OK, data: data);
+            var list = data.Select(item => new GetDbTablesItemOutputDto { Name = item.Item1, Sql = item.Item2 }).ToList();
+            return new UnifiedResponse<List<GetDbTablesItemOutputDto>>(HttpStatusCode.OK, data: list);
         }
 
         [HttpGet, HttpPost]

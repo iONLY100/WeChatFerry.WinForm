@@ -710,6 +710,20 @@ public class WcfClient
         return "";
     }
 
+    public async Task<string> GetContactHeadImgByWxid(string wxid)
+    {
+        var data = await QuerySql("Misc.db", $"SELECT smallHeadBuf FROM \"ContactHeadImg1\" WHERE \"usrName\" = '{wxid}';");
+        if (data.Count > 0)
+        {
+            if (data[0]["smallHeadBuf"] is byte[] bytes)
+            {
+                return Convert.ToBase64String(bytes);
+            }
+        }
+
+        return "";
+    }
+
     /// <summary>
     /// 下载附件（图片、视频、文件）。这方法别直接调用，下载图片使用 `download_image`。
     /// </summary>

@@ -419,7 +419,29 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<string>(HttpStatusCode.OK, data: data);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GetContactHeadImgByWxid(OneParamInputDto<string> input)
+        {
+            var data = await MainForm.Instance.WcfClient.GetContactHeadImgByWxid(input.Param);
+            if (string.IsNullOrWhiteSpace(data))
+            {
+                return new UnifiedResponse<string>(HttpStatusCode.NotFound, $"未能获取到 {input.Param} 的头像");
+            }
 
+            var img = ConvertFromBase64ToImage(data);
+            return await Task.FromResult<FileResult>(File(img, "image/jpg"));
+
+
+            MemoryStream ConvertFromBase64ToImage(string base64String)
+            {
+                // 将base64字符串转换为字节数组
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+                // 使用Bitmap类从字节数组创建图片
+                return ms;
+            }
+
+        }
 
     }
 }

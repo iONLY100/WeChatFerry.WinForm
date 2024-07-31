@@ -234,6 +234,7 @@
             Text = "Form1";
             FormClosing += MainForm_FormClosing;
             FormClosed += MainForm_FormClosed;
+            Shown += MainForm_Shown;
             windowBar1.ResumeLayout(false);
             panelLeft.ResumeLayout(false);
             panel2.ResumeLayout(false);

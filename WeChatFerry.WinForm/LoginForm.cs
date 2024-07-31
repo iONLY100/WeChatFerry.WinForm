@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntdUI;
 using WeChatFerry.WinForm.Helper;
+using WeChatFerry.WinForm.WeChatFerry;
 
 namespace WeChatFerry.WinForm
 {
@@ -35,6 +36,7 @@ namespace WeChatFerry.WinForm
         public LoginForm()
         {
             InitializeComponent();
+            this.Load += LoginForm_Load;
             this.inputNumPort.Value = GlobalValue.Config.WcfPort;
             this.switchDebug.Checked = GlobalValue.Config.DebugModel == 1;
 
@@ -45,6 +47,11 @@ namespace WeChatFerry.WinForm
             avatarLogo.MouseDown += (_, _) => { DraggableMouseDown(); };
             panelLogo.MouseDown += (_, _) => { DraggableMouseDown(); };
             labelVer.MouseDown += (_, _) => { DraggableMouseDown(); };
+        }
+
+        private void LoginForm_Load(object? sender, EventArgs e)
+        {
+            this.Left -= this.Width;
         }
 
         public sealed override Size MinimumSize
@@ -76,10 +83,10 @@ namespace WeChatFerry.WinForm
             Environment.Exit(0);
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
+        private async void btnStart_Click(object sender, EventArgs e)
         {
             AntdUI.Button btn = (AntdUI.Button)sender;
-            var btnText= btn.Text;
+            var btnText = btn.Text;
             var dic = new Dictionary<string, int>
             {
                 { "debug", switchDebug.Checked ? 1 : 0 },
@@ -90,13 +97,17 @@ namespace WeChatFerry.WinForm
             switchDebug.Enabled = false;
             inputNumPort.Enabled = false;
             btn.Text = "等待微信登录";
-            Task.Run(() =>
+            await Task.Run(async () =>
             {
                 LoginClick?.Invoke(dic, e);
+                while (!await GlobalValue.WcfClient.IsLogin())
+                {
+                    await Task.Delay(1000);
+                }
                 if (btn.IsDisposed) return;
                 btn.Invoke(() =>
                 {
-                    if (btn.IsDisposed) return; 
+                    if (btn.IsDisposed) return;
                     btn.Loading = false;
                     btn.Enabled = true;
                     switchDebug.Enabled = true;

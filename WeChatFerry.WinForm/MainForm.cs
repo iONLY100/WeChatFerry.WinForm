@@ -32,7 +32,6 @@ public partial class MainForm : Window
     public static MainForm Instance => _instance ??= new MainForm();
     private WebView2Control? HttpApiDocControl { get; set; }
     public readonly SdkClass Sdk;
-    public WcfClient WcfClient = null!;
     private readonly DateTime _runStartTime = DateTime.Now;
 
     private readonly BackgroundWorker _worker = new();
@@ -40,7 +39,7 @@ public partial class MainForm : Window
 
     public MainForm()
     {
-        
+
 
         _logger.LogInformation("starting...");
         InitializeComponent();
@@ -59,7 +58,7 @@ public partial class MainForm : Window
             var debug = dic["debug"] == 1;
             var port = dic["port"];
             InjectSpy(debug, port);
-            while (!await WcfClient.IsLogin())
+            while (!await GlobalValue.WcfClient.IsLogin())
             {
                 await Task.Delay(1000);
             }
@@ -149,7 +148,7 @@ public partial class MainForm : Window
             Notification.success(this, "注入成功", "注入成功", TAlignFrom.Top, Font);
         }
 
-        WcfClient = new WcfClient(port: port);
+        GlobalValue.WcfClient = new WcfClient(port: port);
     }
 
     private void AddControl(Control control)
@@ -162,7 +161,7 @@ public partial class MainForm : Window
 
     private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
     {
-        
+
         ExitApp();
     }
 
@@ -248,22 +247,23 @@ public partial class MainForm : Window
                 switch (it.Text)
                 {
                     case "退出":
-                    {
-                        ExitApp();
-                        break;
-                    }
+                        {
+                            ExitApp();
+                            break;
+                        }
                     case "显示主窗口":
                         this.notifyIcon1.Visible = false;
                         this.Show();
                         break;
                 }
-            }, menuList, 0) { TopMost = true, Align = TAlign.TR }.open();
+            }, menuList, 0)
+            { TopMost = true, Align = TAlign.TR }.open();
         }
     }
 
     private async void ExitApp()
-    { 
-        await WcfClient.DisableRecvMsg();
+    {
+        await GlobalValue.WcfClient.DisableRecvMsg();
         Sdk.WxDestroySdk();
         LoginForm.ExitApp();
     }
@@ -283,17 +283,17 @@ public partial class MainForm : Window
                 switch (btn.Name)
                 {
                     case "Minimize2tray":
-                    {
-                        this.notifyIcon1.Visible = true;
-                        this.Hide();
-                        e.Cancel = true;
-                        break;
-                    }
+                        {
+                            this.notifyIcon1.Visible = true;
+                            this.Hide();
+                            e.Cancel = true;
+                            break;
+                        }
                     case "CancelExit":
-                    {
-                        e.Cancel = true;
-                        break;
-                    }
+                        {
+                            e.Cancel = true;
+                            break;
+                        }
                 }
             },
             OnOk = _ =>
@@ -302,7 +302,7 @@ public partial class MainForm : Window
                 {
                     OkText = "是",
                     CancelText = "否",
-                    OnOk = _=>
+                    OnOk = _ =>
                     {
                         ExitProcess("wechat");
                         return true;
@@ -333,5 +333,30 @@ public partial class MainForm : Window
     private void avatar_Click(object sender, EventArgs e)
     {
         AntdUI.Popover.open(avatar, new UserInfoControl { Size = new Size(370, 200) }, TAlign.RT);
+    }
+
+
+
+    private async void MainForm_Shown(object sender, EventArgs e)
+    {
+        var avatarBase64Str = await GlobalValue.WcfClient.GetContactHeadImgByWxid(await GlobalValue.WcfClient.GetSelfWxid());
+
+        if (string.IsNullOrWhiteSpace(avatarBase64Str))
+        {
+            return;
+        }
+        avatar.Invoke(() => { avatar.Image = ConvertFromBase64ToImage(avatarBase64Str); });
+
+        return;
+
+        Bitmap ConvertFromBase64ToImage(string base64String)
+        {
+            // 将base64字符串转换为字节数组
+            var imageBytes = Convert.FromBase64String(base64String);
+            using MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+            // 使用Bitmap类从字节数组创建图片
+            Bitmap bmp = new Bitmap(ms);
+            return bmp;
+        }
     }
 }

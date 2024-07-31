@@ -127,11 +127,11 @@ namespace WeChatFerry.WinForm.Controls
 
                 CallbackUrlList=callbackAddressList;
 
-                await MainForm.Instance.WcfClient.EnableRecvMsg(RecvText, switchListenPyq.Checked);
+                await GlobalValue.WcfClient.EnableRecvMsg(RecvText, switchListenPyq.Checked);
             }
             else
             {
-                await MainForm.Instance.WcfClient.DisableRecvMsg();
+                await GlobalValue.WcfClient.DisableRecvMsg();
                 CallbackUrlList=null;
             }
         }

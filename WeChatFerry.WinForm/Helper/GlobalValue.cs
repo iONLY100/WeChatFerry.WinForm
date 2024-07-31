@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WeChatFerry.WinForm.WeChatFerry;
 
 namespace WeChatFerry.WinForm.Helper
 {
@@ -23,5 +24,8 @@ spyFilePath : \\spy\\v39.2.4\\sdk.dll
 callBackUrlList :
     - http://127.0.0.1:19001/api/app/testWeChat/weChatCallBackWxHelper
     - https://www.baidu.com";
+
+
+        public static WcfClient WcfClient { get; set; }
     }
 }

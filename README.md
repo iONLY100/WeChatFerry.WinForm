@@ -18,12 +18,12 @@
 
 截图
 
-![](.\doc\images\img-loginform.png) 
+![](https://raw.githubusercontent.com/iONLY100/WeChatFerry.WinForm/master/doc/images/img-loginform.png) 
 
-![](.\doc\images\img-homecontrol.png)
+![](https://raw.githubusercontent.com/iONLY100/WeChatFerry.WinForm/master/doc/images/img-homecontrol.png)
 
-![](.\doc\images\img-apidoccontrol.png)
+![](https://raw.githubusercontent.com/iONLY100/WeChatFerry.WinForm/master/doc/images/img-apidoccontrol.png)
 
-![](.\doc\images\img-settingeditcontrol.png)
+![](https://raw.githubusercontent.com/iONLY100/WeChatFerry.WinForm/master/doc/images/img-settingeditcontrol.png)
 
-![](.\doc\images\img-notifyicon.png)
+![](https://raw.githubusercontent.com/iONLY100/WeChatFerry.WinForm/master/doc/images/img-notifyicon.png)

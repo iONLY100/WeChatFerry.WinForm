@@ -22,13 +22,19 @@ using static System.Windows.Forms.LinkLabel;
 
 namespace WeChatFerry.WinForm.HttpApi
 {
+    /// <inheritdoc/>
     [ApiController]
     [Route("[controller]/[action]")]
     public class WcfController:ControllerBase
     {
         private readonly ILogger<WcfController> _logger = NLogHelper.CreateLogger<WcfController>();
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 获取登录二维码，已经登录则返回空字符串
+        /// <para>好像无法获取正常的登录链接</para>
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetQrCodeAsync()
         {
             var data = await GlobalValue.WcfClient.GetQrCode();
@@ -50,45 +56,66 @@ namespace WeChatFerry.WinForm.HttpApi
             }
         }
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 是否已登录
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> IsLoginAsync()
         {
             var data=await GlobalValue.WcfClient.IsLogin();
             return new UnifiedResponse<string>(HttpStatusCode.OK, data: data.ToString());
         }
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 获取登录账户的 wxid
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetSelfWxidAsync()
         {
             var data = await GlobalValue.WcfClient.GetSelfWxid();
             return new UnifiedResponse<string>(HttpStatusCode.OK, data: data);
         }
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 获取所有消息类型
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetMsgTypes()
         {
             var data = await GlobalValue.WcfClient.GetMsgTypes();
             return new UnifiedResponse<Dictionary<int, string>>(HttpStatusCode.OK, data: data);
         }
-        [HttpGet, HttpPost]
+
+        /// <summary>
+        /// 获取完整通讯录
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetContacts()
         {
             var data = await GlobalValue.WcfClient.GetContacts();
             return new UnifiedResponse<List<RpcContact>>(HttpStatusCode.OK, data: data);
         }
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 获取所有数据库
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetDbNames()
         {
             var data=await GlobalValue.WcfClient.GetDbNames();
             return new UnifiedResponse<List<string>>(HttpStatusCode.OK, data: data);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetDbTables(string dbName)
-        {
-            return await GetDbTables(new OneParamInputDto<string> { Param = dbName });
-        }
 
+        /// <summary>
+        /// 获取 db 中所有表
+        /// </summary>
+        /// <param name="input">>数据库名（可通过 `GetDbNames` 查询）</param>
+        /// <returns>`db` 下的所有表名及对应建表语句</returns>
         [HttpPost]
         public async Task<IActionResult> GetDbTables(OneParamInputDto<string> input)
         {
@@ -97,19 +124,34 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<List<GetDbTablesItemOutputDto>>(HttpStatusCode.OK, data: list);
         }
 
-        [HttpGet, HttpPost]
+        /// <summary>
+        /// 获取登录账号个人信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetUserInfo()
         {
             var data=await GlobalValue.WcfClient.GetUserInfo();
             return new UnifiedResponse<UserInfo>(HttpStatusCode.OK, data: data);
         }
 
+        /// <summary>
+        /// 获取语音消息并转成 MP3
+        /// </summary>
+        /// <param name="id">语音消息 id</param>
+        /// <param name="timeOut">超时时间（秒）</param>
+        /// <returns>成功返回音频，否则返回错误信息</returns>
         [HttpGet]
         public async Task<IActionResult> GetAudioMsg(ulong id, uint timeOut = 3)
         {
             return await GetAudioMsg(new TwoParamInputDto<ulong, uint>() { Param1 = id, Param2 = timeOut });
         }
 
+        /// <summary>
+        /// 获取语音消息并转成 MP3
+        /// </summary>
+        /// <param name="input">参考 GET 请求，param1: id, param2: timeOut</param>
+        /// <returns>成功返回音频，否则返回错误信息</returns>
         [HttpPost]
         public async Task<IActionResult> GetAudioMsg(TwoParamInputDto<ulong,uint> input)
         {
@@ -127,13 +169,24 @@ namespace WeChatFerry.WinForm.HttpApi
 
         }
 
-
+        /// <summary>
+        /// 发送文本消息
+        /// </summary>
+        /// <param name="msg">要发送的消息，换行使用 `\n` （单杠）；如果 @ 人的话，需要带上跟 `aters` 里数量相同的 @</param>
+        /// <param name="receiver">消息接收人，wxid 或者 roomid</param>
+        /// <param name="aters">要 @ 的 wxid，多个用逗号分隔；`@所有人` 只需要 `notify@all`</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendText(string msg, string receiver, string aters = "")
         {
             return await SendText(new TextMsg { Msg = msg, Receiver = receiver, Aters = aters });
         }
 
+        /// <summary>
+        /// 发送文本消息
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendText(TextMsg msg)
         {
@@ -146,12 +199,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
+        /// <summary>
+        /// 发送图片
+        /// </summary>
+        /// <param name="path">图片网络路径</param>
+        /// <param name="receiver">消息接收人，wxid 或者 roomid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendImage(string path, string receiver)
         {
             return await SendImage(new PathMsg { Path = path, Receiver = receiver });
         }
 
+        /// <summary>
+        /// 发送图片
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendImage(PathMsg msg)
         {
@@ -164,13 +228,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
-
+        /// <summary>
+        /// 发送文件
+        /// </summary>
+        /// <param name="path">文件网络路径</param>
+        /// <param name="receiver">消息接收人，wxid 或者 roomid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendFile(string path, string receiver)
         {
             return await SendFile(new PathMsg { Path = path, Receiver = receiver });
         }
 
+        /// <summary>
+        /// 发送文件
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendFile(PathMsg msg)
         {
@@ -183,13 +257,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
-
+        /// <summary>
+        /// 发送表情
+        /// </summary>
+        /// <param name="path">表情图网络路径</param>
+        /// <param name="receiver">消息接收人，wxid 或者 roomid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendEmotion(string path, string receiver)
         {
             return await SendEmotion(new PathMsg { Path = path, Receiver = receiver });
         }
 
+        /// <summary>
+        /// 发送表情
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendEmotion(PathMsg msg)
         {
@@ -202,12 +286,25 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
+        /// <summary>
+        /// 发送 XML [未实现]
+        /// </summary>
+        /// <param name="receiver">消息接收人，wxid 或者 roomid</param>
+        /// <param name="xml">xml 内容</param>
+        /// <param name="type">xml 类型，如：0x21 为小程序</param>
+        /// <param name="path">封面图片路径</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendXml(string receiver, string xml, int type, string? path = null)
         {
             return await SendXml(new XmlMsg { Receiver = receiver, Content = xml, Type = type, Path = path });
         }
 
+        /// <summary>
+        /// 发送 XML [未实现]
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendXml(XmlMsg msg)
         {
@@ -220,12 +317,29 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
+        /// <summary>
+        /// 发送富文本消息
+        /// </summary>
+        /// <param name="name">左下显示的名字</param>
+        /// <param name="account">填公众号 id 可以显示对应的头像（gh_ 开头的）</param>
+        /// <param name="title">标题，最多两行</param>
+        /// <param name="digest">摘要，三行</param>
+        /// <param name="url">点击后跳转的链接</param>
+        /// <param name="thumbUrl">缩略图的链接</param>
+        /// <param name="receiver">接收人, wxid 或者 roomid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendRichText(string name, string account, string title, string digest, string url,
             string thumbUrl, string receiver)
         {
             return await SendRichText(new RichText { Name = name, Account = account, Title = title, Digest = digest, Url = url, Thumburl = thumbUrl, Receiver = receiver });
         }
+
+        /// <summary>
+        /// 发送富文本消息
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendRichText(RichText msg)
         {
@@ -237,11 +351,24 @@ namespace WeChatFerry.WinForm.HttpApi
 
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
+
+        /// <summary>
+        /// 拍一拍群友
+        /// </summary>
+        /// <param name="roomid">群 id</param>
+        /// <param name="wxid">要拍的群友的 wxid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> SendPatMsg(string roomid, string wxid)
         {
             return await SendPatMsg(new PatMsg { Roomid = roomid, Wxid = wxid });
         }
+
+        /// <summary>
+        /// 拍一拍群友
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SendPatMsg(PatMsg msg)
         {
@@ -254,11 +381,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
+        /// <summary>
+        /// 转发消息。可以转发文本、图片、表情、甚至各种 XML；语音也行，不过效果嘛，自己验证吧。
+        /// </summary>
+        /// <param name="id">待转发消息的 id</param>
+        /// <param name="receiver">消息接收者，wxid 或者 roomid</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> ForwardMsg(ulong id, string receiver)
         {
             return await ForwardMsg(new ForwardMsg { Id = id, Receiver = receiver });
         }
+
+        /// <summary>
+        /// 转发消息。可以转发文本、图片、表情、甚至各种 XML；语音也行，不过效果嘛，自己验证吧。
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> ForwardMsg(ForwardMsg msg)
         {
@@ -271,11 +410,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "发送失败");
         }
 
+        /// <summary>
+        /// 执行 SQL，如果数据量大注意分页，以免 BOOM
+        /// </summary>
+        /// <param name="db">要查询的数据库</param>
+        /// <param name="sql">要执行的 SQL</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> QuerySql(string db, string sql)
         {
             return await QuerySql(new DbQuery { Db = db, Sql = sql });
         }
+        
+        /// <summary>
+        /// 执行 SQL，如果数据量大注意分页，以免 BOOM
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> QuerySql(DbQuery msg)
         {
@@ -283,11 +434,24 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<List<Dictionary<string, object?>>>(HttpStatusCode.OK, data: data);
         }
 
+        /// <summary>
+        /// 通过好友申请
+        /// </summary>
+        /// <param name="v3">加密用户名 (好友申请消息里 v3 开头的字符串)</param>
+        /// <param name="v4">Ticket (好友申请消息里 v4 开头的字符串)</param>
+        /// <param name="scene">申请方式 (好友申请消息里的 scene); 为了兼容旧接口，默认为扫码添加 (30)</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> AcceptNewFriend(string v3, string v4, int scene = 30)
         {
             return await AcceptNewFriend(new Verification { V3 = v3, V4 = v4, Scene = scene });
         }
+
+        /// <summary>
+        /// 通过好友申请
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> AcceptNewFriend(Verification msg)
         {
@@ -300,13 +464,35 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "通过好友申请失败");
         }
 
-        [HttpGet,HttpPost]
+        /// <summary>
+        /// 获取好友列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<IActionResult> GetFriends()
         {
             var data=await GlobalValue.WcfClient.GetFriends();
             return new UnifiedResponse<List<RpcContact>>(HttpStatusCode.OK, data: data);
         }
 
+        /// <summary>
+        /// 接收转账
+        /// </summary>
+        /// <param name="wxid">转账消息里的发送人 wxid</param>
+        /// <param name="transFerId">转账消息里的 transferid</param>
+        /// <param name="transActionId">转账消息里的 transactionid</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> ReceiveTransfer(string wxid,string transFerId, string transActionId)
+        {
+            return await ReceiveTransfer(new Transfer() { Wxid = wxid, Tfid = transFerId, Taid = transActionId });
+        }
+
+        /// <summary>
+        /// 接收转账
+        /// </summary>
+        /// <param name="msg">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> ReceiveTransfer(Transfer msg)
         {
@@ -317,6 +503,23 @@ namespace WeChatFerry.WinForm.HttpApi
             }
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "接收转账失败");
         }
+
+        /// <summary>
+        /// 刷新朋友圈
+        /// </summary>
+        /// <param name="id">开始 id，0 为最新页</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> RefreshPyq(ulong id)
+        {
+            return await RefreshPyq(new OneParamInputDto<ulong>(){Param = id});
+        }
+
+        /// <summary>
+        /// 刷新朋友圈
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param: id</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> RefreshPyq(OneParamInputDto<ulong> input)
         {
@@ -328,6 +531,22 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "刷新朋友圈失败");
         }
 
+        /// <summary>
+        /// 通过 wxid 查询微信号昵称等信息
+        /// </summary>
+        /// <param name="wxid">联系人 wxid</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetInfoByWxid(string wxid)
+        {
+            return await GetInfoByWxid(new OneParamInputDto<string>(){Param = wxid});
+        }
+
+        /// <summary>
+        /// 通过 wxid 查询微信号昵称等信息
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param: wxid</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> GetInfoByWxid(OneParamInputDto<string> input)
         {
@@ -338,6 +557,23 @@ namespace WeChatFerry.WinForm.HttpApi
             }
             return new UnifiedResponse<RpcContact>(HttpStatusCode.OK, data: data);
         }
+
+        /// <summary>
+        /// 撤回消息
+        /// </summary>
+        /// <param name="id">待撤回消息的 id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> RevokeMsg(ulong id)
+        {
+            return await RevokeMsg(new OneParamInputDto<ulong>() { Param = id });
+        }
+
+        /// <summary>
+        /// 撤回消息
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param: id</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> RevokeMsg(OneParamInputDto<ulong> input)
         {
@@ -350,6 +586,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "撤回消息失败");
         }
 
+        /// <summary>
+        /// 获取 OCR 结果。鸡肋，需要图片能自动下载；通过下载接口下载的图片无法识别。
+        /// </summary>
+        /// <param name="extra">待识别的图片路径，消息里的 extra</param>
+        /// <param name="timeout">超时时间（秒）</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetOcrResult(string extra,int timeout)
+        {
+            return await GetOcrResult(new TwoParamInputDto<string, int>() { Param1 = extra, Param2 = timeout });
+        }
+
+        /// <summary>
+        /// 获取 OCR 结果。鸡肋，需要图片能自动下载；通过下载接口下载的图片无法识别。
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param1: extra, param2: timeout</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> GetOcrResult(TwoParamInputDto<string, int> input)
         {
@@ -357,6 +610,24 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<string>(HttpStatusCode.OK, data: data);
         }
 
+        /// <summary>
+        /// 下载图片
+        /// </summary>
+        /// <param name="id">消息中 id</param>
+        /// <param name="extra">消息中的 extra</param>
+        /// <param name="timeout">超时时间（秒）</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> DownloadImage(ulong id,string extra,int timeout)
+        {
+            return await DownloadImage(new DownloadImageInputDto() { Id = id, Extra = extra, Timeout = timeout });
+        }
+
+        /// <summary>
+        /// 下载图片
+        /// </summary>
+        /// <param name="input">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> DownloadImage(DownloadImageInputDto input)
         {
@@ -371,6 +642,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return await Task.FromResult<FileResult>(File(stream, "image/jpg"));
         }
 
+        /// <summary>
+        /// 添加群成员
+        /// </summary>
+        /// <param name="roomid">待加群的 id</param>
+        /// <param name="wxids">要加到群里的 wxid，多个用逗号分隔</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> AddChatRoomMembers(string roomid, string wxids)
+        {
+            return await AddChatRoomMembers(new MemberMgmt { Roomid = roomid, Wxids = wxids });
+        }
+
+        /// <summary>
+        /// 添加群成员
+        /// </summary>
+        /// <param name="input">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> AddChatRoomMembers(MemberMgmt input)
         {
@@ -381,6 +669,24 @@ namespace WeChatFerry.WinForm.HttpApi
             }
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "添加群成员失败");
         }
+
+        /// <summary>
+        /// 删除群成员
+        /// </summary>
+        /// <param name="roomid">待加群的 id</param>
+        /// <param name="wxids">要删除成员的 wxid，多个用逗号分隔</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> DelChatRoomMembers(string roomid, string wxids)
+        {
+            return await DelChatRoomMembers(new MemberMgmt { Roomid = roomid, Wxids = wxids });
+        }
+
+        /// <summary>
+        /// 删除群成员
+        /// </summary>
+        /// <param name="input">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> DelChatRoomMembers(MemberMgmt input)
         {
@@ -391,6 +697,24 @@ namespace WeChatFerry.WinForm.HttpApi
             }
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "删除群成员失败");
         }
+
+        /// <summary>
+        /// 邀请群成员
+        /// </summary>
+        /// <param name="roomid">待加群的 id</param>
+        /// <param name="wxids">要邀请成员的 wxid，多个用逗号分隔</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> InviteChatRoomMembers(string roomid, string wxids)
+        {
+            return await InviteChatRoomMembers(new MemberMgmt { Roomid = roomid, Wxids = wxids });
+        }
+
+        /// <summary>
+        /// 邀请群成员
+        /// </summary>
+        /// <param name="input">参考 GET 请求</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> InviteChatRoomMembers(MemberMgmt input)
         {
@@ -401,6 +725,23 @@ namespace WeChatFerry.WinForm.HttpApi
             }
             return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "邀请群成员失败");
         }
+
+        /// <summary>
+        /// 获取群成员
+        /// </summary>
+        /// <param name="roomid">群的 id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetChatRoomMembers(string roomid)
+        {
+            return await GetChatRoomMembers(new OneParamInputDto<string>() { Param = roomid });
+        }
+
+        /// <summary>
+        /// 获取群成员
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param: roomid</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> GetChatRoomMembers(OneParamInputDto<string> input)
         {
@@ -408,6 +749,23 @@ namespace WeChatFerry.WinForm.HttpApi
             return new UnifiedResponse<Dictionary<string,string>>(HttpStatusCode.OK, data:data);
         }
 
+        /// <summary>
+        /// 获取群名片
+        /// </summary>
+        /// <param name="wxid">wxid</param>
+        /// <param name="roomid">群的 id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetAliasInChatRoom(string wxid, string roomid)
+        {
+            return await GetAliasInChatRoom(new TwoParamInputDto<string, string>() { Param1 = wxid, Param2 = roomid });
+        }
+        /// <summary>
+        /// 获取群名片
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param1: wxid, param2: roomid</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpPost]
         public async Task<IActionResult> GetAliasInChatRoom(TwoParamInputDto<string,string> input)
         {
@@ -418,7 +776,22 @@ namespace WeChatFerry.WinForm.HttpApi
             var data = await GlobalValue.WcfClient.GetAliasInChatRoom(input.Param1,input.Param2);
             return new UnifiedResponse<string>(HttpStatusCode.OK, data: data);
         }
+        /// <summary>
+        /// 根据 wxid 获取头像
+        /// </summary>
+        /// <param name="wxid">wxid</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetContactHeadImgByWxid(string wxid)
+        {
+            return await GetContactHeadImgByWxid(new OneParamInputDto<string>() { Param = wxid });
+        }
 
+        /// <summary>
+        /// 根据 wxid 获取头像
+        /// </summary>
+        /// <param name="input">参考 GET 请求 param: wxid</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> GetContactHeadImgByWxid(OneParamInputDto<string> input)
         {

@@ -9,6 +9,7 @@
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
     <FileVersion>39.2.4.1-alpha</FileVersion>
     <ApplicationIcon>WeChatFerry.ico</ApplicationIcon>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

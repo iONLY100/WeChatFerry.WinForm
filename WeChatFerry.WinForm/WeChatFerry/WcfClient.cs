@@ -527,7 +527,7 @@ public class WcfClient
     /// 获取 OCR 结果。鸡肋，需要图片能自动下载；通过下载接口下载的图片无法识别。
     /// </summary>
     /// <param name="extra">待识别的图片路径，消息里的 extra</param>
-    /// <param name="timeout"></param>
+    /// <param name="timeout">超时时间（秒） 默认2</param>
     /// <returns>OCR 结果</returns>
     public async Task<string> GetOcrResult(string extra, int timeout = 2)
     {
@@ -710,6 +710,11 @@ public class WcfClient
         return "";
     }
 
+    /// <summary>
+    /// 根据 wxid 获取头像
+    /// </summary>
+    /// <param name="wxid">wxid</param>
+    /// <returns>成功返回base64, 否则返回空</returns>
     public async Task<string> GetContactHeadImgByWxid(string wxid)
     {
         var data = await QuerySql("Misc.db", $"SELECT smallHeadBuf FROM \"ContactHeadImg1\" WHERE \"usrName\" = '{wxid}';");

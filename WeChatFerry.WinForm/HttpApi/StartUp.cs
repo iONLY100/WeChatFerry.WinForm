@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,11 +30,21 @@ namespace WeChatFerry.WinForm.HttpApi
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-                options.SerializerSettings.Converters.Add(new ParseStringConverter());
+                options.SerializerSettings.Converters.Add(new ParseStringConverter<ulong>());
 
             });
             services.AddRouting();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(options =>
+            {
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath, true);
+                options.MapType<ulong>(() => new OpenApiSchema
+                {
+                    Type = "string"
+                });
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,18 +65,21 @@ namespace WeChatFerry.WinForm.HttpApi
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
-    public class ParseStringConverter : JsonConverter
+    public class ParseStringConverter<T> : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(long) || t == typeof(long?) || t == typeof(ulong) || t == typeof(ulong?);
+        public override bool CanConvert(Type t) =>  t == typeof(T) || t == typeof(T?);
 
         public override object? ReadJson(JsonReader reader, Type t, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (long.TryParse(value, out var l))
+            // 将value 转换为 T 类型
+            if (value != null)
             {
-                return l;
+                return (T)Convert.ChangeType(value, typeof(T));
             }
+
+
             throw new Exception("Cannot unmarshal type long/ulong");
         }
 
@@ -75,10 +90,10 @@ namespace WeChatFerry.WinForm.HttpApi
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (long)untypedValue;
+            var value = (T)untypedValue;
             serializer.Serialize(writer, value.ToString());
         }
 
-        public static readonly ParseStringConverter Singleton = new ParseStringConverter();
+        public static readonly ParseStringConverter<T> Singleton = new();
     }
 }

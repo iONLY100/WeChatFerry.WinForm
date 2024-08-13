@@ -231,7 +231,7 @@
             MinimumSize = new Size(510, 520);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Form1";
+            Text = "WeChatFerry.Winform";
             FormClosing += MainForm_FormClosing;
             FormClosed += MainForm_FormClosed;
             Shown += MainForm_Shown;

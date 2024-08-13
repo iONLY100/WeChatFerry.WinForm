@@ -179,7 +179,7 @@
             Name = "LoginForm";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "LoginForm";
+            Text = "注入";
             ResumeLayout(false);
             PerformLayout();
         }

@@ -329,7 +329,7 @@ namespace WeChatFerry.WinForm.HttpApi
         /// <param name="receiver">接收人, wxid 或者 roomid</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> SendRichText(string name, string account, string title, string digest, string url,
+        public async Task<IActionResult> SendRichText(string? name, string? account, string title, string digest, string url,
             string thumbUrl, string receiver)
         {
             return await SendRichText(new RichText { Name = name, Account = account, Title = title, Digest = digest, Url = url, Thumburl = thumbUrl, Receiver = receiver });
@@ -344,7 +344,7 @@ namespace WeChatFerry.WinForm.HttpApi
         public async Task<IActionResult> SendRichText(RichText msg)
         {
             var data = await GlobalValue.WcfClient.SendRichText(msg.Name,msg.Account,msg.Title,msg.Digest,msg.Url,msg.Thumburl,msg.Receiver);
-            if (data == 0)
+            if (data == 1)
             {
                 return new UnifiedResponse<object>(HttpStatusCode.OK);
             }

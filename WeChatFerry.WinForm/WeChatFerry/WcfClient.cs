@@ -260,7 +260,7 @@ public class WcfClient
     /// <param name="thumbUrl">缩略图的链接</param>
     /// <param name="receiver">接收人, wxid 或者 roomid</param>
     /// <returns>0 为成功，其他失败</returns>
-    public async Task<int> SendRichText(string name, string account, string title, string digest, string url,
+    public async Task<int> SendRichText(string? name, string? account, string title, string digest, string url,
         string thumbUrl, string receiver)
     {
         var response = await GetResponse(new Request

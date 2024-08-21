@@ -7,9 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <FileVersion>39.2.4.1-alpha</FileVersion>
+    <FileVersion>39.2.4.2-alpha</FileVersion>
     <ApplicationIcon>WeChatFerry.ico</ApplicationIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

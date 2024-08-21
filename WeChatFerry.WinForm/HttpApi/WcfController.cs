@@ -637,9 +637,11 @@ namespace WeChatFerry.WinForm.HttpApi
             {
                 return new UnifiedResponse<object>(HttpStatusCode.InternalServerError, "下载图片失败");
             }
-            await using var stream = System.IO.File.Open(data, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            _logger.LogInformation($"解析后图片地址{data}");
 
-            return await Task.FromResult<FileResult>(File(stream, "image/jpg"));
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(data);
+            return await Task.FromResult<FileResult>(File(fileBytes, "image/jpg"));
+            
         }
 
         /// <summary>

@@ -48,7 +48,11 @@ namespace WeChatFerry.WinForm.Controls
             }
             foreach (var callbackUrl in CallbackUrlList)
             {
-                await callbackUrl.PostJsonAsync(msg);
+                try
+                {
+                    await callbackUrl.PostJsonAsync(msg);
+                }catch(Exception ee) {
+                }
             }
         }
 

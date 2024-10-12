@@ -411,7 +411,7 @@ namespace WeChatFerry.WinForm.HttpApi
         }
 
         /// <summary>
-        /// 执行 SQL，如果数据量大注意分页，以免 BOOM
+        /// 执行 SQL，如果数据量大注意分页，以免 OOM
         /// </summary>
         /// <param name="db">要查询的数据库</param>
         /// <param name="sql">要执行的 SQL</param>
@@ -423,7 +423,7 @@ namespace WeChatFerry.WinForm.HttpApi
         }
         
         /// <summary>
-        /// 执行 SQL，如果数据量大注意分页，以免 BOOM
+        /// 执行 SQL，如果数据量大注意分页，以免 OOM
         /// </summary>
         /// <param name="msg">参考 GET 请求</param>
         /// <returns></returns>
